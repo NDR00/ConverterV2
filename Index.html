@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Unit & Measurement Hub</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1976d2">
+
+    <style>
+        :root {
+            --primary: #1976d2;
+            --primary-light: #e3f2fd;
+            --bg: #f4f5f8;
+            --card-bg: #ffffff;
+            --text: #212121;
+            --text-sub: #666666;
+            --border: #d0d0d0;
+            --history-bg: #fafafa;
+        }
+
+        body.dark-mode {
+            --primary: #90caf9;
+            --primary-light: #1e3a5f;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --text-sub: #aaaaaa;
+            --border: #3d3d3d;
+            --history-bg: #252525;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Adaptive 2-Column Layout for Foldable / Large Displays */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .layout-grid {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-sizing: border-box;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* Category Tabs */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            scrollbar-width: thin;
+        }
+
+        .tab-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        body.dark-mode .tab-btn.active {
+            color: #121212;
+        }
+
+        /* Form Controls */
+        .field-group {
+            flex: 1;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 11px;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .swap-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 18px;
+            flex-shrink: 0;
+        }
+
+        .precision-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .precision-bar select {
+            width: auto;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* Result Panel */
+        .result-box {
+            background: var(--primary-light);
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 14px;
+            position: relative;
+        }
+
+        .result-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            word-break: break-word;
+        }
+
+        body.dark-mode .result-val {
+            color: #90caf9;
+        }
+
+        .tape-fraction {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* History Panel */
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            background: var(--history-bg);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item span {
+            color: var(--text-sub);
+            font-size: 11px;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-bar">
+        <h2>Quick Converter Pro</h2>
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
+    </div>
+
+    <!-- Quick Search Bar -->
+    <input type="text" class="search-box" id="quickSearch" placeholder="🔍 Quick search unit (e.g., psi, rai, gpm, ah, baht)..." oninput="handleSearch()">
+
+    <div class="layout-grid">
+        <!-- Main Converter Panel -->
+        <div class="card">
+            <div class="tabs" id="categoryTabs">
+                <button class="tab-btn active" id="tab-tape" onclick="setCategory('tape', this)">Tape / Length</button>
+                <button class="tab-btn" id="tab-materials" onclick="setCategory('materials', this)">Lumber & Materials</button>
+                <button class="tab-btn" id="tab-water" onclick="setCategory('water', this)">Water & Pumping</button>
+                <button class="tab-btn" id="tab-electrical" onclick="setCategory('electrical', this)">Solar & Electrical</button>
+                <button class="tab-btn" id="tab-weight" onclick="setCategory('weight', this)">Weight & Gold</button>
+                <button class="tab-btn" id="tab-area" onclick="setCategory('area', this)">Area & Land</button>
+                <button class="tab-btn" id="tab-cooking" onclick="setCategory('cooking', this)">Cooking Spoons</button>
+                <button class="tab-btn" id="tab-volume" onclick="setCategory('volume', this)">Liquid Volume</button>
+                <button class="tab-btn" id="tab-pressure" onclick="setCategory('pressure', this)">Pressure & Torque</button>
+                <button class="tab-btn" id="tab-fuel" onclick="setCategory('fuel', this)">Fuel Economy</button>
+                <button class="tab-btn" id="tab-speed" onclick="setCategory('speed', this)">Speed</button>
+                <button class="tab-btn" id="tab-distance" onclick="setCategory('distance', this)">Distance</button>
+                <button class="tab-btn" id="tab-temp" onclick="setCategory('temp', this)">Temperature</button>
+                <button class="tab-btn" id="tab-data" onclick="setCategory('data', this)">Data Storage</button>
+            </div>
+
+            <!-- Input Form -->
+            <div class="field-group">
+                <label for="inputVal">Amount</label>
+                <input type="text" id="inputVal" value="1" oninput="convert()" placeholder="e.g. 12, 1/2, or 5 3/8">
+            </div>
+
+            <div class="row">
+                <div class="field-group">
+                    <label for="fromUnit">From</label>
+                    <select id="fromUnit" onchange="convert()"></select>
+                </div>
+
+                <button class="swap-btn" onclick="swapUnits()" title="Swap Units">⇄</button>
+
+                <div class="field-group">
+                    <label for="toUnit">To</label>
+                    <select id="toUnit" onchange="convert()"></select>
+                </div>
+            </div>
+
+            <div class="precision-bar">
+                <span>Decimals:</span>
+                <select id="precisionSelect" onchange="convert()">
+                    <option value="0">0</option>
+                    <option value="2" selected>2</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+
+            <!-- Output Box -->
+            <div class="result-box">
+                <div class="result-val" id="outputVal">--</div>
+                <div class="tape-fraction" id="tapeFraction"></div>
+                <div class="action-row">
+                    <button class="btn-action" onclick="copyResult()">📋 Copy Result</button>
+                    <button class="btn-action" onclick="logToHistory()">💾 Save to Log</button>
+                </div>
+            </div>
+
+            <div class="hint">Fractions like <b>1/8</b>, <b>3/4</b>, or <b>5 1/2</b> are supported in the amount box.</div>
+        </div>
+
+        <!-- History / Reference Panel -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <label style="margin: 0;">Recent Conversions</label>
+                <button class="btn-action" style="padding: 2px 8px; font-size: 11px;" onclick="clearHistory()">Clear</button>
+            </div>
+            <ul class="history-list" id="historyList">
+                <li class="history-item" style="color: var(--text-sub);">No conversions logged yet.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const categories = {
+        tape: {
+            units: {
+                in: { name: "Inches (in)", baseRatio: 1 },
+                mm: { name: "Millimeters (mm)", baseRatio: 0.0393701 },
+                cm: { name: "Centimeters (cm)", baseRatio: 0.393701 },
+                ft: { name: "Feet (ft)", baseRatio: 12 },
+                m:  { name: "Meters (m)", baseRatio: 39.3701 },
+                yd: { name: "Yards (yd)", baseRatio: 36 }
+            },
+            defaultFrom: "in",
+            defaultTo: "mm"
+        },
+        materials: {
+            units: {
+                bdft: { name: "Board Feet (1\"×12\"×12\")", baseRatio: 1 },
+                cuft: { name: "Cubic Feet (ft³)", baseRatio: 12 },
+                cuyd: { name: "Cubic Yards (yd³ - concrete/soil)", baseRatio: 324 },
+                cum:  { name: "Cubic Meters (m³)", baseRatio: 423.776 }
+            },
+            defaultFrom: "cuyd",
+            defaultTo: "cum"
+        },
+        water: {
+            units: {
+                gpm:  { name: "Gallons/Min (GPM)", baseRatio: 1 },
+                lmin: { name: "Liters/Min (L/min)", baseRatio: 0.264172 },
+                lsec: { name: "Liters/Sec (L/s)", baseRatio: 15.8503 },
+                psi:  { name: "Head Pressure (PSI)", baseRatio: 1 },
+                mhead:{ name: "Meters of Water Head", baseRatio: 1.42233 }
+            },
+            defaultFrom: "gpm",
+            defaultTo: "lmin"
+        },
+        electrical: {
+            units: {
+                kwh:    { name: "Kilowatt-Hours (kWh)", baseRatio: 1 },
+                ah12:   { name: "Amp-Hours @ 12V (Ah)", baseRatio: 0.012 },
+                ah24:   { name: "Amp-Hours @ 24V (Ah)", baseRatio: 0.024 },
+                ah48:   { name: "Amp-Hours @ 48V (Ah)", baseRatio: 0.048 },
+                wh:     { name: "Watt-Hours (Wh)", baseRatio: 0.001 }
+            },
+            defaultFrom: "kwh",
+            defaultTo: "ah48"
+        },
+        weight: {
+            units: {
+                lb:          { name: "Pounds (lbs)", baseRatio: 1 },
+                kg:          { name: "Kilograms (kg)", baseRatio: 2.20462 },
+                oz:          { name: "Ounces (oz)", baseRatio: 0.0625 },
+                g:           { name: "Grams (g)", baseRatio: 0.00220462 },
+                troy_oz:     { name: "99.999% Fine Gold (Troy Oz - 31.1035g)", baseRatio: 0.0685714 },
+                gold_orn:    { name: "Thai Gold Baht - Jewelry 96.5% (15.16g)", baseRatio: 0.033422 },
+                gold_bar:    { name: "Thai Gold Baht - Bar 96.5% (15.244g)", baseRatio: 0.033607 }
+            },
+            defaultFrom: "gold_bar",
+            defaultTo: "g"
+        },
+        area: {
+            units: {
+                sqft: { name: "Square Feet (sq ft)", baseRatio: 1 },
+                sqm:  { name: "Square Meters (sq m)", baseRatio: 10.7639 },
+                acre: { name: "Acres", baseRatio: 43560 },
+                ha:   { name: "Hectares", baseRatio: 107639 },
+                rai:  { name: "Rai (ไร่ - 1,600 m²)", baseRatio: 17222.3 },
+                ngan: { name: "Ngan (งาน - 400 m²)", baseRatio: 4305.56 },
+                wah:  { name: "Sq. Wah (ตารางวา - 4 m²)", baseRatio: 43.0556 }
+            },
+            defaultFrom: "rai",
+            defaultTo: "sqm"
+        },
+        cooking: {
+            units: {
+                tsp:   { name: "Teaspoon (tsp)", baseRatio: 1 },
+                tbsp:  { name: "Tablespoon (tbsp)", baseRatio: 3 },
+                dstsp: { name: "Dessertspoon (dstsp - 2 tsp)", baseRatio: 2 },
+                dram:  { name: "Fluid Dram (fl dr - 3/4 tsp)", baseRatio: 0.75 },
+                dash:  { name: "Dash (1/8 tsp)", baseRatio: 0.125 },
+                pinch: { name: "Pinch (1/16 tsp)", baseRatio: 0.0625 },
+                drop:  { name: "Drop (1/64 tsp)", baseRatio: 0.015625 },
+                cup:   { name: "Cups (US)", baseRatio: 48 },
+                ml:    { name: "Milliliters (mL)", baseRatio: 0.202884 },
+                floz:  { name: "Fluid Oz (fl oz)", baseRatio: 6 }
+            },
+            defaultFrom: "tbsp",
+            defaultTo: "ml"
+        },
+        volume: {
+            units: {
+                gal:  { name: "Gallons (US)", baseRatio: 1 },
+                l:    { name: "Liters (L)", baseRatio: 0.264172 },
+                floz: { name: "Fluid Oz (fl oz)", baseRatio: 0.0078125 },
+                ml:   { name: "Milliliters (mL)", baseRatio: 0.000264172 }
+            },
+            defaultFrom: "gal",
+            defaultTo: "l"
+        },
+        pressure: {
+            units: {
+                psi:  { name: "PSI (lbs/sq in)", baseRatio: 1 },
+                bar:  { name: "Bar", baseRatio: 14.5038 },
+                kpa:  { name: "kPa (Kilopascals)", baseRatio: 0.145038 },
+                ftlb: { name: "Ft-Lbs (Torque)", baseRatio: 1 },
+                nm:   { name: "N·m (Newton-meters)", baseRatio: 0.737562 }
+            },
+            defaultFrom: "psi",
+            defaultTo: "bar"
+        },
+        fuel: {
+            units: {
+                mpg:    { name: "Miles/Gallon (US MPG)" },
+                kml:    { name: "Km/Liter (km/L)" },
+                l100km: { name: "Liters/100km (L/100km)" }
+            },
+            defaultFrom: "mpg",
+            defaultTo: "kml"
+        },
+        speed: {
+            units: {
+                mph: { name: "Miles/Hour (mph)", baseRatio: 1 },
+                kph: { name: "Km/Hour (km/h)", baseRatio: 0.621371 }
+            },
+            defaultFrom: "mph",
+            defaultTo: "kph"
+        },
+        distance: {
+            units: {
+                mi: { name: "Miles", baseRatio: 1 },
+                km: { name: "Kilometers (km)", baseRatio: 0.621371 }
+            },
+            defaultFrom: "mi",
+            defaultTo: "km"
+        },
+        temp: {
+            units: {
+                f: { name: "Fahrenheit (°F)" },
+                c: { name: "Celsius (°C)" }
+            },
+            defaultFrom: "f",
+            defaultTo: "c"
+        },
+        data: {
+            units: {
+                mbps: { name: "Megabits/sec (Mbps)", baseRatio: 1 },
+                mbs:  { name: "Megabytes/sec (MB/s)", baseRatio: 8 },
+                gb:   { name: "Gigabytes (GB)", baseRatio: 8000 },
+                tb:   { name: "Terabytes (TB)", baseRatio: 8000000 }
+            },
+            defaultFrom: "mbps",
+            defaultTo: "mbs"
+        }
+    };
+
+    let currentCategory = "tape";
+    let lastFormattedResult = "";
+    let historyEntries = [];
+
+    function parseFraction(str) {
+        if (!str) return NaN;
+        str = str.trim();
+        if (str.includes(' ')) {
+            let parts = str.split(' ');
+            let whole = parseFloat(parts[0]);
+            let fracParts = parts[1].split('/');
+            if (fracParts.length === 2) {
+                return whole + (parseFloat(fracParts[0]) / parseFloat(fracParts[1]));
+            }
+        } else if (str.includes('/')) {
+            let parts = str.split('/');
+            if (parts.length === 2) {
+                return parseFloat(parts[0]) / parseFloat(parts[1]);
+            }
+        }
+        return parseFloat(str);
+    }
+
+    // Nearest 1/16th Ruler Tape Fraction Helper
+    function toTapeFraction(valInches) {
+        if (isNaN(valInches) || valInches < 0) return "";
+        let whole = Math.floor(valInches);
+        let remainder = valInches - whole;
+        let sixteenths = Math.round(remainder * 16);
+
+        if (sixteenths === 16) {
+            whole += 1;
+            sixteenths = 0;
+        }
+
+        if (sixteenths === 0) return whole > 0 ? `(Exact: ${whole}")` : "";
+
+        let num = sixteenths;
+        let den = 16;
+        while (num % 2 === 0 && den % 2 === 0) {
+            num /= 2;
+            den /= 2;
+        }
+
+        let fracStr = whole > 0 ? `${whole} ${num}/${den}"` : `${num}/${den}"`;
+        return `≈ Tape Ruler: ${fracStr}`;
+    }
+
+    function setCategory(catKey, element) {
+        currentCategory = catKey;
+
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (element) {
+            element.classList.add('active');
+            element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        const cat = categories[catKey];
+        const fromSelect = document.getElementById('fromUnit');
+        const toSelect = document.getElementById('toUnit');
+
+        fromSelect.innerHTML = '';
+        toSelect.innerHTML = '';
+
+        for (let key in cat.units) {
+            fromSelect.options.add(new Option(cat.units[key].name, key));
+            toSelect.options.add(new Option(cat.units[key].name, key));
+        }
+
+        fromSelect.value = cat.defaultFrom;
+        toSelect.value = cat.defaultTo;
+
+        convert();
+    }
+
+    function swapUnits() {
+        const fromSelect = document.getElementById('fromUnit');
+        const toSelect = document.getElementById('toUnit');
+        const temp = fromSelect.value;
+        fromSelect.value = toSelect.value;
+        toSelect.value = temp;
+        convert();
+    }
+
+    function convert() {
+        const inputRaw = document.getElementById('inputVal').value;
+        const val = parseFraction(inputRaw);
+        const from = document.getElementById('fromUnit').value;
+        const to = document.getElementById('toUnit').value;
+        const outBox = document.getElementById('outputVal');
+        const fracBox = document.getElementById('tapeFraction');
+        const precision = parseInt(document.getElementById('precisionSelect').value);
+
+        fracBox.innerText = "";
+
+        if (isNaN(val) || !from || !to) {
+            outBox.innerText = "--";
+            lastFormattedResult = "";
+            return;
+        }
+
+        let result = 0;
+
+        if (currentCategory === "temp") {
+            if (from === "f" && to === "c") result = (val - 32) * 5 / 9;
+            else if (from === "c" && to === "f") result = (val * 9 / 5) + 32;
+            else result = val;
+        } 
+        else if (currentCategory === "fuel") {
+            let mpgVal = val;
+            if (from === "kml") mpgVal = val * 2.35215;
+            else if (from === "l100km") mpgVal = 235.215 / val;
+
+            if (to === "mpg") result = mpgVal;
+            else if (to === "kml") result = mpgVal / 2.35215;
+            else if (to === "l100km") result = 235.215 / mpgVal;
+        } 
+        else {
+            const catUnits = categories[currentCategory].units;
+            const baseValue = val * catUnits[from].baseRatio;
+            result = baseValue / catUnits[to].baseRatio;
+        }
+
+        const formatted = result.toFixed(precision);
+        const unitName = categories[currentCategory].units[to].name.split('(')[0].trim();
+        lastFormattedResult = `${formatted} ${unitName}`;
+        outBox.innerText = lastFormattedResult;
+
+        // Show tape ruler approximation if destination is inches
+        if (to === "in") {
+            fracBox.innerText = toTapeFraction(result);
+        }
+    }
+
+    function copyResult() {
+        if (!lastFormattedResult) return;
+        navigator.clipboard.writeText(lastFormattedResult).then(() => {
+            const outBox = document.getElementById('outputVal');
+            const original = outBox.innerText;
+            outBox.innerText = "Copied to Clipboard!";
+            setTimeout(() => { outBox.innerText = original; }, 1200);
+        });
+    }
+
+    function logToHistory() {
+        if (!lastFormattedResult) return;
+        const inputVal = document.getElementById('inputVal').value;
+        const fromName = categories[currentCategory].units[document.getElementById('fromUnit').value].name.split('(')[0].trim();
+        const entry = `${inputVal} ${fromName} → ${lastFormattedResult}`;
+
+        historyEntries.unshift(entry);
+        if (historyEntries.length > 6) historyEntries.pop();
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('historyList');
+        if (historyEntries.length === 0) {
+            list.innerHTML = '<li class="history-item" style="color: var(--text-sub);">No conversions logged yet.</li>';
+            return;
+        }
+        list.innerHTML = historyEntries.map(item => `<li class="history-item"><b>${item}</b></li>`).join('');
+    }
+
+    function clearHistory() {
+        historyEntries = [];
+        renderHistory();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        document.getElementById('themeToggle').innerText = isDark ? "Light Mode" : "Dark Mode";
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    function handleSearch() {
+        const query = document.getElementById('quickSearch').value.toLowerCase().trim();
+        if (!query) return;
+
+        for (let catKey in categories) {
+            for (let unitKey in categories[catKey].units) {
+                const uName = categories[catKey].units[unitKey].name.toLowerCase();
+                if (uName.includes(query) || unitKey.toLowerCase() === query) {
+                    const tabBtn = document.getElementById(`tab-${catKey}`);
+                    setCategory(catKey, tabBtn);
+                    document.getElementById('fromUnit').value = unitKey;
+                    convert();
+                    return;
+                }
+            }
+        }
+    }
+
+    window.onload = function() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').innerText = "Light Mode";
+        }
+        setCategory('tape', document.getElementById('tab-tape'));
+    };
+</script>
+</body>
+</html>
