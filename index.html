@@ -35,7 +35,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Sarabun", "Noto Sans Thai", Helvetica, Arial, sans-serif;
             padding: 8px;
             background-color: var(--bg);
             color: var(--text);
@@ -57,7 +57,7 @@
         .top-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 8px;
         }
 
@@ -71,11 +71,11 @@
             color: var(--text);
         }
 
-        .theme-btn {
+        .menu-btn {
             background: var(--bg);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 6px 10px;
+            padding: 6px 9px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
@@ -117,7 +117,7 @@
             color: #121212;
         }
 
-        /* Primary Output Box (At Top for Zero Scroll) */
+        /* Primary Output Box */
         .result-box {
             background: var(--primary-light);
             padding: 10px;
@@ -164,19 +164,19 @@
             cursor: pointer;
         }
 
-        /* Compact Grid Controls */
+        /* Form Controls */
+        .input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
         .control-grid {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
             gap: 6px;
             align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 6px;
             margin-bottom: 6px;
         }
 
@@ -192,7 +192,7 @@
         input, select {
             width: 100%;
             padding: 8px;
-            font-size: 15px;
+            font-size: 14px;
             border: 1px solid var(--border);
             border-radius: 6px;
             background: var(--card-bg);
@@ -245,53 +245,46 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .hint {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-top: 6px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <!-- Top Bar -->
+    <!-- Top Bar with Search, Language Toggle, and Theme Toggle -->
     <div class="top-row">
-        <input type="text" class="search-box" id="quickSearch" placeholder="🔍 Search unit (e.g. rai, psi, gpm, oz)..." oninput="handleSearch()">
-        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">Theme</button>
+        <input type="text" class="search-box" id="quickSearch" placeholder="🔍 Search unit / ค้นหาหน่วย..." oninput="handleSearch()">
+        <button class="menu-btn" id="langToggle" onclick="toggleLanguage()">ไทย</button>
+        <button class="menu-btn" id="themeToggle" onclick="toggleTheme()">Theme</button>
     </div>
 
     <!-- Category Tabs -->
-    <div class="tabs" id="categoryTabs">
-        <button class="tab-btn active" id="tab-tape" onclick="setCategory('tape', this)">Tape</button>
-        <button class="tab-btn" id="tab-weight" onclick="setCategory('weight', this)">Weight & Gold</button>
-        <button class="tab-btn" id="tab-area" onclick="setCategory('area', this)">Area/Land</button>
-        <button class="tab-btn" id="tab-cooking" onclick="setCategory('cooking', this)">Cooking Spoons</button>
-        <button class="tab-btn" id="tab-materials" onclick="setCategory('materials', this)">Materials</button>
-        <button class="tab-btn" id="tab-water" onclick="setCategory('water', this)">Water/Pump</button>
-        <button class="tab-btn" id="tab-electrical" onclick="setCategory('electrical', this)">Solar/Battery</button>
-        <button class="tab-btn" id="tab-volume" onclick="setCategory('volume', this)">Volume</button>
-        <button class="tab-btn" id="tab-pressure" onclick="setCategory('pressure', this)">Pressure/Torque</button>
-        <button class="tab-btn" id="tab-fuel" onclick="setCategory('fuel', this)">Fuel</button>
-        <button class="tab-btn" id="tab-speed" onclick="setCategory('speed', this)">Speed</button>
-        <button class="tab-btn" id="tab-distance" onclick="setCategory('distance', this)">Distance</button>
-        <button class="tab-btn" id="tab-temp" onclick="setCategory('temp', this)">Temp</button>
-        <button class="tab-btn" id="tab-data" onclick="setCategory('data', this)">Data</button>
-    </div>
+    <div class="tabs" id="categoryTabs"></div>
 
     <!-- Pinned Top Result Display -->
     <div class="result-box">
         <div class="result-val" id="outputVal">--</div>
         <div class="tape-fraction" id="tapeFraction"></div>
         <div class="action-row">
-            <button class="btn-action" onclick="copyResult()">📋 Copy</button>
-            <button class="btn-action" onclick="logToHistory()">💾 Log</button>
+            <button class="btn-action" id="btnCopy" onclick="copyResult()">📋 Copy</button>
+            <button class="btn-action" id="btnLog" onclick="logToHistory()">💾 Log</button>
         </div>
     </div>
 
     <!-- Amount & Precision Row -->
     <div class="input-row">
         <div>
-            <label for="inputVal">Amount (Fractions ok: 1/8, 5 1/2)</label>
+            <label for="inputVal" id="labelAmount">Amount (Fractions: 1/8, 5 1/2)</label>
             <input type="text" id="inputVal" value="1" oninput="convert()">
         </div>
         <div>
-            <label for="precisionSelect">Decimals</label>
+            <label for="precisionSelect" id="labelDecimals">Decimals</label>
             <select id="precisionSelect" onchange="convert()">
                 <option value="0">0</option>
                 <option value="2" selected>2</option>
@@ -303,175 +296,228 @@
     <!-- From / Swap / To Units Grid -->
     <div class="control-grid">
         <div>
-            <label for="fromUnit">From</label>
+            <label for="fromUnit" id="labelFrom">From</label>
             <select id="fromUnit" onchange="convert()"></select>
         </div>
 
         <button class="swap-btn" onclick="swapUnits()" title="Swap Units">⇄</button>
 
         <div>
-            <label for="toUnit">To</label>
+            <label for="toUnit" id="labelTo">To</label>
             <select id="toUnit" onchange="convert()"></select>
         </div>
     </div>
 
-    <!-- Compact Expandable History -->
+    <div class="hint" id="hintText">Fractions like 1/8, 3/4, or 5 1/2 are supported.</div>
+
+    <!-- History Log -->
     <details>
-        <summary>View History Log</summary>
+        <summary id="summaryHistory">View History Log</summary>
         <ul class="history-list" id="historyList">
-            <li class="history-item" style="color: var(--text-sub);">No entries logged yet.</li>
+            <li class="history-item" id="emptyHistoryMsg" style="color: var(--text-sub);">No entries logged yet.</li>
         </ul>
     </details>
 </div>
 
 <script>
+    let currentLang = localStorage.getItem('lang') || 'en';
+
+    const UI_STRINGS = {
+        en: {
+            searchPlaceholder: "🔍 Search unit (e.g. rai, psi, gpm, oz)...",
+            theme: "Theme",
+            copy: "📋 Copy",
+            copied: "Copied!",
+            log: "💾 Log",
+            amount: "Amount (Fractions: 1/8, 5 1/2)",
+            decimals: "Decimals",
+            from: "From",
+            to: "To",
+            hint: "Fractions like 1/8, 3/4, or 5 1/2 are supported in the amount box.",
+            historyTitle: "View History Log",
+            historyEmpty: "No entries logged yet.",
+            tapePrefix: "≈ Tape: ",
+            exactPrefix: "(Exact: "
+        },
+        th: {
+            searchPlaceholder: "🔍 ค้นหาหน่วย (เช่น ไร่, นิ้ว, ลิตร, บาททอง)...",
+            theme: "ธีม",
+            copy: "📋 คัดลอก",
+            copied: "คัดลอกแล้ว!",
+            log: "💾 บันทึก",
+            amount: "จำนวน (ใส่เศษส่วนได้: 1/8, 5 1/2)",
+            decimals: "ทศนิยม",
+            from: "จากหน่วย",
+            to: "เป็นหน่วย",
+            hint: "สามารถพิมพ์เศษส่วนเช่น 1/8, 3/4 หรือ 5 1/2 ลงในช่องได้",
+            historyTitle: "ดูประวัติการแปลงค่า",
+            historyEmpty: "ยังไม่มีประวัติการคำนวณ",
+            tapePrefix: "≈ สายวัด/ตลับเมตร: ",
+            exactPrefix: "(พอดี: "
+        }
+    };
+
     const categories = {
         tape: {
+            title: { en: "Tape", th: "ตลับเมตร/ความยาว" },
             units: {
-                in: { name: "Inches (in)", baseRatio: 1 },
-                mm: { name: "Millimeters (mm)", baseRatio: 0.0393701 },
-                cm: { name: "Centimeters (cm)", baseRatio: 0.393701 },
-                ft: { name: "Feet (ft)", baseRatio: 12 },
-                m:  { name: "Meters (m)", baseRatio: 39.3701 },
-                yd: { name: "Yards (yd)", baseRatio: 36 }
+                in: { name: { en: "Inches (in)", th: "นิ้ว (in)" }, baseRatio: 1 },
+                mm: { name: { en: "Millimeters (mm)", th: "มิลลิเมตร (mm)" }, baseRatio: 0.0393701 },
+                cm: { name: { en: "Centimeters (cm)", th: "เซนติเมตร (cm)" }, baseRatio: 0.393701 },
+                ft: { name: { en: "Feet (ft)", th: "ฟุต (ft)" }, baseRatio: 12 },
+                m:  { name: { en: "Meters (m)", th: "เมตร (m)" }, baseRatio: 39.3701 },
+                yd: { name: { en: "Yards (yd)", th: "หลา (yd)" }, baseRatio: 36 }
             },
             defaultFrom: "in",
             defaultTo: "mm"
         },
         weight: {
+            title: { en: "Weight & Gold", th: "น้ำหนักและทองคำ" },
             units: {
-                lb:          { name: "Pounds (lbs)", baseRatio: 1 },
-                kg:          { name: "Kilograms (kg)", baseRatio: 2.20462 },
-                oz:          { name: "Ounces (oz)", baseRatio: 0.0625 },
-                g:           { name: "Grams (g)", baseRatio: 0.00220462 },
-                troy_oz:     { name: "99.999% Fine Gold (Troy Oz)", baseRatio: 0.0685714 },
-                gold_orn:    { name: "Thai Gold Baht - Jewelry (15.16g)", baseRatio: 0.033422 },
-                gold_bar:    { name: "Thai Gold Baht - Bar (15.244g)", baseRatio: 0.033607 }
+                lb:          { name: { en: "Pounds (lbs)", th: "ปอนด์ (lbs)" }, baseRatio: 1 },
+                kg:          { name: { en: "Kilograms (kg)", th: "กิโลกรัม (kg)" }, baseRatio: 2.20462 },
+                oz:          { name: { en: "Ounces (oz)", th: "ออนซ์ (oz)" }, baseRatio: 0.0625 },
+                g:           { name: { en: "Grams (g)", th: "กรัม (g)" }, baseRatio: 0.00220462 },
+                troy_oz:     { name: { en: "99.999% Gold (Troy Oz)", th: "ทองคำ 99.999% (ทรอยออนซ์)" }, baseRatio: 0.0685714 },
+                gold_orn:    { name: { en: "Thai Gold Baht - Jewelry (15.16g)", th: "ทองรูปพรรณ (1 บาท = 15.16 กรัม)" }, baseRatio: 0.033422 },
+                gold_bar:    { name: { en: "Thai Gold Baht - Bar (15.244g)", th: "ทองคำแท่ง (1 บาท = 15.244 กรัม)" }, baseRatio: 0.033607 }
             },
             defaultFrom: "gold_bar",
             defaultTo: "g"
         },
         area: {
+            title: { en: "Area/Land", th: "พื้นที่/ที่ดิน" },
             units: {
-                sqft: { name: "Sq Feet (sq ft)", baseRatio: 1 },
-                sqm:  { name: "Sq Meters (sq m)", baseRatio: 10.7639 },
-                rai:  { name: "Rai (ไร่ - 1600m²)", baseRatio: 17222.3 },
-                ngan: { name: "Ngan (งาน - 400m²)", baseRatio: 4305.56 },
-                wah:  { name: "Sq Wah (4m²)", baseRatio: 43.0556 },
-                acre: { name: "Acres", baseRatio: 43560 },
-                ha:   { name: "Hectares", baseRatio: 107639 }
+                rai:  { name: { en: "Rai (ไร่ - 1,600 m²)", th: "ไร่ (1,600 ตร.ม.)" }, baseRatio: 17222.3 },
+                ngan: { name: { en: "Ngan (งาน - 400 m²)", th: "งาน (400 ตร.ม.)" }, baseRatio: 4305.56 },
+                wah:  { name: { en: "Sq. Wah (ตารางวา - 4 m²)", th: "ตารางวา (4 ตร.ม.)" }, baseRatio: 43.0556 },
+                sqm:  { name: { en: "Sq Meters (m²)", th: "ตารางเมตร (ตร.ม.)" }, baseRatio: 10.7639 },
+                sqft: { name: { en: "Sq Feet (sq ft)", th: "ตารางฟุต (sq ft)" }, baseRatio: 1 },
+                acre: { name: { en: "Acres", th: "เอเคอร์ (Acres)" }, baseRatio: 43560 },
+                ha:   { name: { en: "Hectares", th: "เฮกตาร์ (Hectares)" }, baseRatio: 107639 }
             },
             defaultFrom: "rai",
             defaultTo: "sqm"
         },
         cooking: {
+            title: { en: "Cooking Spoons", th: "ช้อนตวง/ครัว" },
             units: {
-                tsp:   { name: "Teaspoon (tsp)", baseRatio: 1 },
-                tbsp:  { name: "Tablespoon (tbsp)", baseRatio: 3 },
-                dstsp: { name: "Dessertspoon (2 tsp)", baseRatio: 2 },
-                dram:  { name: "Fluid Dram (3/4 tsp)", baseRatio: 0.75 },
-                dash:  { name: "Dash (1/8 tsp)", baseRatio: 0.125 },
-                pinch: { name: "Pinch (1/16 tsp)", baseRatio: 0.0625 },
-                drop:  { name: "Drop (1/64 tsp)", baseRatio: 0.015625 },
-                cup:   { name: "Cups (US)", baseRatio: 48 },
-                ml:    { name: "Milliliters (mL)", baseRatio: 0.202884 },
-                floz:  { name: "Fluid Oz (fl oz)", baseRatio: 6 }
+                tsp:   { name: { en: "Teaspoon (tsp)", th: "ช้อนชา (tsp)" }, baseRatio: 1 },
+                tbsp:  { name: { en: "Tablespoon (tbsp)", th: "ช้อนโต๊ะ (tbsp)" }, baseRatio: 3 },
+                dstsp: { name: { en: "Dessertspoon (2 tsp)", th: "ช้อนของหวาน (2 ช้อนชา)" }, baseRatio: 2 },
+                dram:  { name: { en: "Fluid Dram (3/4 tsp)", th: "ฟลูอิดดรัม (3/4 ช้อนชา)" }, baseRatio: 0.75 },
+                dash:  { name: { en: "Dash (1/8 tsp)", th: "แดช (1/8 ช้อนชา)" }, baseRatio: 0.125 },
+                pinch: { name: { en: "Pinch (1/16 tsp)", th: "หยิบมือ (1/16 ช้อนชา)" }, baseRatio: 0.0625 },
+                drop:  { name: { en: "Drop (1/64 tsp)", th: "หยด (1/64 ช้อนชา)" }, baseRatio: 0.015625 },
+                cup:   { name: { en: "Cups (US)", th: "ถ้วยตวง (US)" }, baseRatio: 48 },
+                ml:    { name: { en: "Milliliters (mL)", th: "มิลลิลิตร (mL)" }, baseRatio: 0.202884 },
+                floz:  { name: { en: "Fluid Oz (fl oz)", th: "ออนซ์ของเหลว (fl oz)" }, baseRatio: 6 }
             },
             defaultFrom: "tbsp",
             defaultTo: "tsp"
         },
         materials: {
+            title: { en: "Materials", th: "วัสดุก่อสร้าง/ไม้" },
             units: {
-                bdft: { name: "Board Feet", baseRatio: 1 },
-                cuft: { name: "Cubic Feet (ft³)", baseRatio: 12 },
-                cuyd: { name: "Cubic Yards (yd³)", baseRatio: 324 },
-                cum:  { name: "Cubic Meters (m³)", baseRatio: 423.776 }
+                bdft: { name: { en: "Board Feet (ไม้)", th: "บอร์ดฟุต (ปริมาตรไม้)" }, baseRatio: 1 },
+                cuft: { name: { en: "Cubic Feet (ft³)", th: "ลูกบาศก์ฟุต (คิวบิกฟุต)" }, baseRatio: 12 },
+                cuyd: { name: { en: "Cubic Yards (yd³)", th: "ลูกบาศก์หลา (คิวหลา)" }, baseRatio: 324 },
+                cum:  { name: { en: "Cubic Meters (คิวปูน)", th: "ลูกบาศก์เมตร (คิวปูน/ดิน)" }, baseRatio: 423.776 }
             },
             defaultFrom: "cuyd",
             defaultTo: "cum"
         },
         water: {
+            title: { en: "Water/Pump", th: "ปั๊มน้ำ/อัตราไหล" },
             units: {
-                gpm:  { name: "Gallons/Min (GPM)", baseRatio: 1 },
-                lmin: { name: "Liters/Min (L/min)", baseRatio: 0.264172 },
-                lsec: { name: "Liters/Sec (L/s)", baseRatio: 15.8503 },
-                psi:  { name: "Head Pressure (PSI)", baseRatio: 1 },
-                mhead:{ name: "Meters Head", baseRatio: 1.42233 }
+                gpm:  { name: { en: "Gallons/Min (GPM)", th: "แกลลอน/นาที (GPM)" }, baseRatio: 1 },
+                lmin: { name: { en: "Liters/Min (L/min)", th: "ลิตร/นาที (L/min)" }, baseRatio: 0.264172 },
+                lsec: { name: { en: "Liters/Sec (L/s)", th: "ลิตร/วินาที (L/s)" }, baseRatio: 15.8503 },
+                psi:  { name: { en: "Head Pressure (PSI)", th: "แรงดันน้ำ (PSI)" }, baseRatio: 1 },
+                mhead:{ name: { en: "Meters Head (ระยะส่งเมตร)", th: "ระยะส่งน้ำแนวตั้ง (เมตร Head)" }, baseRatio: 1.42233 }
             },
             defaultFrom: "gpm",
             defaultTo: "lmin"
         },
         electrical: {
+            title: { en: "Solar/Battery", th: "โซลาร์เซลล์/แบตเตอรี่" },
             units: {
-                kwh:  { name: "Kilowatt-Hours (kWh)", baseRatio: 1 },
-                ah12: { name: "Amp-Hours @ 12V", baseRatio: 0.012 },
-                ah24: { name: "Amp-Hours @ 24V", baseRatio: 0.024 },
-                ah48: { name: "Amp-Hours @ 48V", baseRatio: 0.048 },
-                wh:   { name: "Watt-Hours (Wh)", baseRatio: 0.001 }
+                kwh:  { name: { en: "Kilowatt-Hours (kWh / หน่วยไฟ)", th: "กิโลวัตต์-ชั่วโมง (kWh / หน่วยไฟ)" }, baseRatio: 1 },
+                ah12: { name: { en: "Amp-Hours @ 12V", th: "แอมป์-ชั่วโมง @ 12V (Ah)" }, baseRatio: 0.012 },
+                ah24: { name: { en: "Amp-Hours @ 24V", th: "แอมป์-ชั่วโมง @ 24V (Ah)" }, baseRatio: 0.024 },
+                ah48: { name: { en: "Amp-Hours @ 48V", th: "แอมป์-ชั่วโมง @ 48V (Ah)" }, baseRatio: 0.048 },
+                wh:   { name: { en: "Watt-Hours (Wh)", th: "วัตต์-ชั่วโมง (Wh)" }, baseRatio: 0.001 }
             },
             defaultFrom: "kwh",
             defaultTo: "ah48"
         },
         volume: {
+            title: { en: "Volume", th: "ปริมาตรของเหลว" },
             units: {
-                gal:  { name: "Gallons (US)", baseRatio: 1 },
-                l:    { name: "Liters (L)", baseRatio: 0.264172 },
-                floz: { name: "Fluid Oz (fl oz)", baseRatio: 0.0078125 },
-                ml:   { name: "Milliliters (mL)", baseRatio: 0.000264172 }
+                gal:  { name: { en: "Gallons (US)", th: "แกลลอน (US)" }, baseRatio: 1 },
+                l:    { name: { en: "Liters (L)", th: "ลิตร (L)" }, baseRatio: 0.264172 },
+                floz: { name: { en: "Fluid Oz (fl oz)", th: "ออนซ์ของเหลว (fl oz)" }, baseRatio: 0.0078125 },
+                ml:   { name: { en: "Milliliters (mL)", th: "มิลลิลิตร (mL)" }, baseRatio: 0.000264172 }
             },
             defaultFrom: "gal",
             defaultTo: "l"
         },
         pressure: {
+            title: { en: "Pressure/Torque", th: "แรงดัน/แรงบิด" },
             units: {
-                psi:  { name: "PSI", baseRatio: 1 },
-                bar:  { name: "Bar", baseRatio: 14.5038 },
-                kpa:  { name: "kPa", baseRatio: 0.145038 },
-                ftlb: { name: "Ft-Lbs (Torque)", baseRatio: 1 },
-                nm:   { name: "N·m (Torque)", baseRatio: 0.737562 }
+                psi:  { name: { en: "PSI (แรงดันยาง)", th: "PSI (ปอนด์/ตร.นิ้ว)" }, baseRatio: 1 },
+                bar:  { name: { en: "Bar (บาร์)", th: "Bar (บาร์)" }, baseRatio: 14.5038 },
+                kpa:  { name: { en: "kPa (กิโลปาสคาล)", th: "kPa (กิโลปาสคาล)" }, baseRatio: 0.145038 },
+                ftlb: { name: { en: "Ft-Lbs (ฟุต-ปอนด์)", th: "Ft-Lbs (ฟุต-ปอนด์)" }, baseRatio: 1 },
+                nm:   { name: { en: "N·m (นิวตัน-เมตร)", th: "N·m (นิวตัน-เมตร)" }, baseRatio: 0.737562 }
             },
             defaultFrom: "psi",
             defaultTo: "bar"
         },
         fuel: {
+            title: { en: "Fuel", th: "อัตราสิ้นเปลืองน้ำมัน" },
             units: {
-                mpg:    { name: "US MPG" },
-                kml:    { name: "Km/Liter" },
-                l100km: { name: "L/100km" }
+                kml:    { name: { en: "Km/Liter (กม./ลิตร)", th: "กิโลเมตร/ลิตร (กม./ลิตร)" } },
+                l100km: { name: { en: "L/100km (ลิตร/100กม.)", th: "ลิตรต่อ 100 กม. (L/100km)" } },
+                mpg:    { name: { en: "US MPG", th: "ไมล์ต่อแกลลอน (MPG)" } }
             },
-            defaultFrom: "mpg",
-            defaultTo: "kml"
+            defaultFrom: "kml",
+            defaultTo: "l100km"
         },
         speed: {
+            title: { en: "Speed", th: "ความเร็ว" },
             units: {
-                mph: { name: "MPH", baseRatio: 1 },
-                kph: { name: "Km/h", baseRatio: 0.621371 }
+                kph: { name: { en: "Km/h (กม./ชม.)", th: "กิโลเมตร/ชั่วโมง (กม./ชม.)" }, baseRatio: 0.621371 },
+                mph: { name: { en: "MPH (ไมล์/ชม.)", th: "ไมล์/ชั่วโมง (MPH)" }, baseRatio: 1 }
             },
-            defaultFrom: "mph",
-            defaultTo: "kph"
+            defaultFrom: "kph",
+            defaultTo: "mph"
         },
         distance: {
+            title: { en: "Distance", th: "ระยะทางไกล" },
             units: {
-                mi: { name: "Miles", baseRatio: 1 },
-                km: { name: "Kilometers", baseRatio: 0.621371 }
+                km: { name: { en: "Kilometers (km)", th: "กิโลเมตร (km)" }, baseRatio: 0.621371 },
+                mi: { name: { en: "Miles", th: "ไมล์ (Miles)" }, baseRatio: 1 }
             },
-            defaultFrom: "mi",
-            defaultTo: "km"
+            defaultFrom: "km",
+            defaultTo: "mi"
         },
         temp: {
+            title: { en: "Temp", th: "อุณหภูมิ" },
             units: {
-                f: { name: "Fahrenheit (°F)" },
-                c: { name: "Celsius (°C)" }
+                c: { name: { en: "Celsius (°C)", th: "เซลเซียส (°C)" } },
+                f: { name: { en: "Fahrenheit (°F)", th: "ฟาเรนไฮต์ (°F)" } }
             },
-            defaultFrom: "f",
-            defaultTo: "c"
+            defaultFrom: "c",
+            defaultTo: "f"
         },
         data: {
+            title: { en: "Data", th: "ข้อมูลดิจิทัล" },
             units: {
-                mbps: { name: "Mbps (Internet)", baseRatio: 1 },
-                mbs:  { name: "MB/s (Download)", baseRatio: 8 },
-                gb:   { name: "Gigabytes (GB)", baseRatio: 8000 },
-                tb:   { name: "Terabytes (TB)", baseRatio: 8000000 }
+                mbps: { name: { en: "Mbps (เน็ต)", th: "Mbps (ความเร็วเน็ต)" }, baseRatio: 1 },
+                mbs:  { name: { en: "MB/s (ดาวน์โหลด)", th: "MB/s (ดาวน์โหลดจริง)" }, baseRatio: 8 },
+                gb:   { name: { en: "Gigabytes (GB)", th: "กิกะไบต์ (GB)" }, baseRatio: 8000 },
+                tb:   { name: { en: "Terabytes (TB)", th: "เทระไบต์ (TB)" }, baseRatio: 8000000 }
             },
             defaultFrom: "mbps",
             defaultTo: "mbs"
@@ -481,6 +527,42 @@
     let currentCategory = "tape";
     let lastFormattedResult = "";
     let historyEntries = [];
+
+    function renderUI() {
+        const s = UI_STRINGS[currentLang];
+        document.getElementById('quickSearch').placeholder = s.searchPlaceholder;
+        document.getElementById('langToggle').innerText = currentLang === 'en' ? 'ไทย' : 'English';
+        document.getElementById('btnCopy').innerText = s.copy;
+        document.getElementById('btnLog').innerText = s.log;
+        document.getElementById('labelAmount').innerText = s.amount;
+        document.getElementById('labelDecimals').innerText = s.decimals;
+        document.getElementById('labelFrom').innerText = s.from;
+        document.getElementById('labelTo').innerText = s.to;
+        document.getElementById('hintText').innerText = s.hint;
+        document.getElementById('summaryHistory').innerText = s.historyTitle;
+
+        // Render Category Tabs
+        const tabsContainer = document.getElementById('categoryTabs');
+        tabsContainer.innerHTML = '';
+        for (let catKey in categories) {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn' + (catKey === currentCategory ? ' active' : '');
+            btn.id = `tab-${catKey}`;
+            btn.innerText = categories[catKey].title[currentLang];
+            btn.onclick = function() { setCategory(catKey, this); };
+            tabsContainer.appendChild(btn);
+        }
+
+        populateDropdowns();
+        convert();
+        renderHistory();
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'th' : 'en';
+        localStorage.setItem('lang', currentLang);
+        renderUI();
+    }
 
     function parseFraction(str) {
         if (!str) return NaN;
@@ -508,40 +590,45 @@
         let sixteenths = Math.round(remainder * 16);
 
         if (sixteenths === 16) { whole += 1; sixteenths = 0; }
-        if (sixteenths === 0) return whole > 0 ? `(Exact: ${whole}")` : "";
+        const s = UI_STRINGS[currentLang];
+        if (sixteenths === 0) return whole > 0 ? `${s.exactPrefix}${whole}")` : "";
 
         let num = sixteenths;
         let den = 16;
         while (num % 2 === 0 && den % 2 === 0) { num /= 2; den /= 2; }
         let fracStr = whole > 0 ? `${whole} ${num}/${den}"` : `${num}/${den}"`;
-        return `≈ Tape: ${fracStr}`;
+        return `${s.tapePrefix}${fracStr}`;
+    }
+
+    function populateDropdowns() {
+        const cat = categories[currentCategory];
+        const fromSelect = document.getElementById('fromUnit');
+        const toSelect = document.getElementById('toUnit');
+        const prevFrom = fromSelect.value || cat.defaultFrom;
+        const prevTo = toSelect.value || cat.defaultTo;
+
+        fromSelect.innerHTML = '';
+        toSelect.innerHTML = '';
+
+        for (let key in cat.units) {
+            const unitLabel = cat.units[key].name[currentLang];
+            fromSelect.options.add(new Option(unitLabel, key));
+            toSelect.options.add(new Option(unitLabel, key));
+        }
+
+        fromSelect.value = cat.units[prevFrom] ? prevFrom : cat.defaultFrom;
+        toSelect.value = cat.units[prevTo] ? prevTo : cat.defaultTo;
     }
 
     function setCategory(catKey, element) {
         currentCategory = catKey;
-
         const buttons = document.querySelectorAll('.tab-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
         if (element) {
             element.classList.add('active');
             element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
-
-        const cat = categories[catKey];
-        const fromSelect = document.getElementById('fromUnit');
-        const toSelect = document.getElementById('toUnit');
-
-        fromSelect.innerHTML = '';
-        toSelect.innerHTML = '';
-
-        for (let key in cat.units) {
-            fromSelect.options.add(new Option(cat.units[key].name, key));
-            toSelect.options.add(new Option(cat.units[key].name, key));
-        }
-
-        fromSelect.value = cat.defaultFrom;
-        toSelect.value = cat.defaultTo;
-
+        populateDropdowns();
         convert();
     }
 
@@ -594,7 +681,7 @@
         }
 
         const formatted = result.toFixed(precision);
-        const unitName = categories[currentCategory].units[to].name.split('(')[0].trim();
+        const unitName = categories[currentCategory].units[to].name[currentLang].split('(')[0].trim();
         lastFormattedResult = `${formatted} ${unitName}`;
         outBox.innerText = lastFormattedResult;
 
@@ -608,7 +695,7 @@
         navigator.clipboard.writeText(lastFormattedResult).then(() => {
             const outBox = document.getElementById('outputVal');
             const original = outBox.innerText;
-            outBox.innerText = "Copied!";
+            outBox.innerText = UI_STRINGS[currentLang].copied;
             setTimeout(() => { outBox.innerText = original; }, 900);
         });
     }
@@ -616,7 +703,7 @@
     function logToHistory() {
         if (!lastFormattedResult) return;
         const inputVal = document.getElementById('inputVal').value;
-        const fromName = categories[currentCategory].units[document.getElementById('fromUnit').value].name.split('(')[0].trim();
+        const fromName = categories[currentCategory].units[document.getElementById('fromUnit').value].name[currentLang].split('(')[0].trim();
         const entry = `${inputVal} ${fromName} → ${lastFormattedResult}`;
 
         historyEntries.unshift(entry);
@@ -627,7 +714,7 @@
     function renderHistory() {
         const list = document.getElementById('historyList');
         if (historyEntries.length === 0) {
-            list.innerHTML = '<li class="history-item" style="color: var(--text-sub);">No entries logged yet.</li>';
+            list.innerHTML = `<li class="history-item" style="color: var(--text-sub);">${UI_STRINGS[currentLang].historyEmpty}</li>`;
             return;
         }
         list.innerHTML = historyEntries.map(item => `<li class="history-item"><span>${item}</span></li>`).join('');
@@ -645,10 +732,10 @@
 
         for (let catKey in categories) {
             for (let unitKey in categories[catKey].units) {
-                const uName = categories[catKey].units[unitKey].name.toLowerCase();
-                if (uName.includes(query) || unitKey.toLowerCase() === query) {
-                    const tabBtn = document.getElementById(`tab-${catKey}`);
-                    setCategory(catKey, tabBtn);
+                const enName = categories[catKey].units[unitKey].name.en.toLowerCase();
+                const thName = categories[catKey].units[unitKey].name.th.toLowerCase();
+                if (enName.includes(query) || thName.includes(query) || unitKey.toLowerCase() === query) {
+                    setCategory(catKey, document.getElementById(`tab-${catKey}`));
                     document.getElementById('fromUnit').value = unitKey;
                     convert();
                     return;
@@ -661,7 +748,7 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
         }
-        setCategory('tape', document.getElementById('tab-tape'));
+        renderUI();
     };
 </script>
 </body>
